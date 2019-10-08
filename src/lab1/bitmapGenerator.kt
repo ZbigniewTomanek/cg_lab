@@ -178,6 +178,32 @@ class BitmapGenerator {
             return image
         }
 
+        fun generateConcentricCircles
+                    (xRes: Int, yRes: Int, circleRadius:Int=20, ringWidth: Int=5, primaryColor: Int= white, secondaryColor: Int= black): BufferedImage {
+            val image = BufferedImage(xRes, yRes, BufferedImage.TYPE_INT_RGB)
+            for (i in 0 until yRes) {
+                for (j in 0 until xRes) {
+                    image.setRGB(j, i, primaryColor)
+                }
+            }
+
+            val ticksX = xRes / (2 * circleRadius)
+            val ticksY = yRes / (2 * circleRadius)
+
+            for (i in 0 .. ticksY) {
+                for (j in 0 .. ticksX) {
+                    val posX = (j.toDouble() / ticksX) * xRes + circleRadius
+                    val posY = (i.toDouble() / ticksY) * yRes + circleRadius
+
+                    drawConcentricCircle(image, posX.toInt(), posY.toInt(), circleRadius, ringWidth, primaryColor, secondaryColor)
+                }
+            }
+
+            saveBitmap(image, "concentric_circles")
+
+            return image
+        }
+
 
         private fun drawCircle(image: BufferedImage, centerX: Int, centerY: Int, radius: Int, color: Int = black) {
             for (i in centerY - radius .. centerY + radius) {
@@ -185,6 +211,29 @@ class BitmapGenerator {
                     if (i in 0 until image.height && j in 0 until image.width) {
                         if (countDistance(j, i, centerX, centerY) <= radius)
                             image.setRGB(j, i, color)
+                    }
+                }
+            }
+        }
+
+        private fun drawConcentricCircle
+                    (image: BufferedImage, centerX: Int, centerY: Int, radius: Int, ringWidth: Int = 5, primaryColor: Int = black, secondaryColor:Int= white) {
+
+            var ringIndex: Int
+            var distance: Double
+            for (i in centerY - radius .. centerY + radius) {
+                for(j in centerX - radius .. centerX + radius) {
+                    if (i in 0 until image.height && j in 0 until image.width) {
+                        distance = countDistance(j, i, centerX, centerY)
+                        if (distance <= radius) {
+                            ringIndex = distance.toInt() / Companion.ringWidth
+
+                            if (ringIndex % 2 == 0)
+                                image.setRGB(j, i, secondaryColor)
+                            else
+                                image.setRGB(j, i, primaryColor)
+
+                        }
                     }
                 }
             }
