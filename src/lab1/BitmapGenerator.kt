@@ -8,12 +8,19 @@ import kotlin.math.atan2
 import kotlin.math.min
 import kotlin.math.sqrt
 
-
-
-
 object BitmapGenerator {
-    private val ringWidth = 10
-    private val blurFactor = 2
+    var ringWidth = 10
+    var blurFactor = 2
+
+    var lineWidth = 10
+    var cheekWidth = 20
+
+    var squareSize = 20
+
+    var circleRadius = 20
+    var circlesDistance = 10
+
+    var degree = 30
 
     val black = intToRGB(0, 0, 0)
     val white = intToRGB(255, 255, 255)
@@ -82,9 +89,6 @@ object BitmapGenerator {
             }
         }
 
-        val lineWidth = 10
-        val cheekWidth = 20
-
         val numOfCols = xRes / (lineWidth + cheekWidth)
         val numOfRows = yRes / (lineWidth+cheekWidth)
 
@@ -107,7 +111,6 @@ object BitmapGenerator {
     fun generateBrettPattern(xRes: Int, yRes: Int, primaryColor: Int= white, secondaryColor: Int=black): BufferedImage {
         val image = BufferedImage(xRes, yRes, BufferedImage.TYPE_INT_RGB)
 
-        val squareSize = 20
         val squaresX = xRes / squareSize
         val squaresY = yRes / squareSize
 
@@ -143,7 +146,7 @@ object BitmapGenerator {
     fun generateRotatedBrett(xRes: Int, yRes: Int, primaryColor: Int = white, secondaryColor: Int = black): BufferedImage {
         val image = BufferedImage(xRes, yRes, BufferedImage.TYPE_INT_RGB)
 
-        val diagonalLength = 40
+        val diagonalLength = (squareSize * sqrt(2.0)).toInt()
         var currentLength = diagonalLength
         var descending = true
 
@@ -155,11 +158,11 @@ object BitmapGenerator {
             for (j in 0 until xRes) {
                 when {
                     whiteInRow > -1 -> {
-                        image.setRGB(j, i, white)
+                        image.setRGB(j, i, primaryColor)
                         whiteInRow--
                     }
                     blackInRow > -(diagonalLength - currentLength - 1) -> {
-                        image.setRGB(j, i, black)
+                        image.setRGB(j, i, secondaryColor)
                         blackInRow--
                     }
                     else -> {
@@ -205,9 +208,6 @@ object BitmapGenerator {
     }
 
     fun generateManySmallCircles(xRes: Int, yRes: Int, primaryColor: Int= white, secondaryColor: Int= black): BufferedImage {
-        val circleRadius:Int=20
-        val circlesDistance:Int=10
-
         val image = BufferedImage(xRes, yRes, BufferedImage.TYPE_INT_RGB)
         for (i in 0 until yRes) {
             for (j in 0 until xRes) {
@@ -236,8 +236,6 @@ object BitmapGenerator {
 
     fun generateConcentricCircles
                 (xRes: Int, yRes: Int, primaryColor: Int= white, secondaryColor: Int= black): BufferedImage {
-        val circleRadius:Int=20
-        val ringWidth: Int=5
 
         val image = BufferedImage(xRes, yRes, BufferedImage.TYPE_INT_RGB)
         for (i in 0 until yRes) {
@@ -265,8 +263,6 @@ object BitmapGenerator {
 
     fun drawJapanFlag(xRes: Int, yRes: Int, primaryColor: Int = white, secondaryColor: Int = black): BufferedImage {
         val image = BufferedImage(xRes, yRes, BufferedImage.TYPE_INT_RGB)
-
-        val degree = 30
 
         val xCenter = xRes / 2
         val yCenter = yRes / 2
@@ -389,7 +385,7 @@ object BitmapGenerator {
 
     private fun saveBitmap(bitmap: BufferedImage, filename: String): Boolean {
         try {
-            val f = File("$filename.bmp")
+            val f = File("$filename${bitmap.width}x${bitmap.height}.bmp")
             ImageIO.write(bitmap, "bmp", f)
         } catch (e: IOException) {
             return false
@@ -407,16 +403,12 @@ object BitmapGenerator {
     }
 
     private fun normalizeRGB(rgb: Int): Double {
-        val blue = rgb and 0xff;
-        val green = (rgb and 0xff00) shr 8;
-        val red = (rgb and 0xff0000) shr 16;
+        val blue = rgb and 0xff
+        val green = (rgb and 0xff00) shr 8
+        val red = (rgb and 0xff0000) shr 16
 
         return (blue + green + red) / (3 * 255.0)
     }
     private fun countDistance(x1: Int, y1: Int, x2: Int, y2: Int)
             = sqrt( ( (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) ).toDouble() )
 }
-
-
-
-
